@@ -1,5 +1,6 @@
 {
-  "name": "app",
+  "name": "Copy of app",
   "description": "MRZ Generator",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "prompt": ""
 }

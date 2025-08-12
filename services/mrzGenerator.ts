@@ -1,47 +1,5 @@
 import { IdData } from '../types';
-
-const getCharValue = (char: string): number => {
-    if (char >= '0' && char <= '9') {
-        return parseInt(char, 10);
-    }
-    if (char >= 'A' && char <= 'Z') {
-        return char.charCodeAt(0) - 55;
-    }
-    return 0; // for '<'
-};
-
-const calculateCheckDigit = (data: string): string => {
-    if (!data || data.replace(/</g, '').length === 0) {
-        return '<';
-    }
-    const weights = [7, 3, 1];
-    let sum = 0;
-    for (let i = 0; i < data.length; i++) {
-        sum += getCharValue(data[i]) * weights[i % 3];
-    }
-    return String(sum % 10);
-};
-
-const formatDate = (date: string): string => {
-    return date.replace(/-/g, '').substring(2);
-};
-
-// For document numbers and personal numbers. Strips non-alphanumeric chars.
-const formatAlphaNumeric = (data: string, length: number): string => {
-    return data.toUpperCase().replace(/[^A-Z0-9]/g, '').padEnd(length, '<').substring(0, length);
-};
-
-// For country codes.
-const formatCode = (data: string, length: number): string => {
-    return data.toUpperCase().replace(/[^A-Z0-9]/g, '<').padEnd(length, '<').substring(0, length);
-};
-
-// For names. Replaces all non-alphabetic separators with a single '<'.
-const formatName = (lastName: string, firstName: string, length: number): string => {
-    const clean = (name: string) => name.toUpperCase().split(/[^A-Z]+/).filter(Boolean).join('<');
-    const formattedName = `${clean(lastName)}<<${clean(firstName)}`;
-    return formattedName.padEnd(length, '<').substring(0, length);
-};
+import { formatAlphaNumeric, calculateCheckDigit, formatDate, formatName, formatCode } from './mrzUtils';
 
 // TD1 Format (3 lines of 30 chars) - ICAO 9303 Part 5
 export const generateTd1 = (data: IdData): string[] => {
@@ -49,7 +7,9 @@ export const generateTd1 = (data: IdData): string[] => {
     const docNum = formatAlphaNumeric(data.documentNumber, 9);
     const docNumCheck = calculateCheckDigit(docNum);
     
-    const optionalData1 = formatAlphaNumeric(data.personalNumber, 15);
+    const optionalData1 = data.includePersonalNumberInMrz 
+        ? formatAlphaNumeric(data.personalNumber, 15)
+        : '<'.repeat(15);
 
     const line1 = [
         'I<', // Document code for ID card
@@ -66,7 +26,7 @@ export const generateTd1 = (data: IdData): string[] => {
     const expiry = formatDate(data.expiryDate);
     const expiryCheck = calculateCheckDigit(expiry);
     
-    const optionalData2 = formatAlphaNumeric('', 11);
+    const optionalData2 = '<'.repeat(11);
 
     const compositeForOverallCheck =
         docNum + docNumCheck +
@@ -75,7 +35,7 @@ export const generateTd1 = (data: IdData): string[] => {
         expiry + expiryCheck +
         optionalData2;
         
-    const overallCheck = calculateCheckDigit(compositeForOverallCheck.replace(/<+$/, '')); // Trailing '<' should not be included
+    const overallCheck = calculateCheckDigit(compositeForOverallCheck);
 
     const line2 = [
         dob,
@@ -108,7 +68,12 @@ export const generateTd3 = (data: IdData): string[] => {
     const expiry = formatDate(data.expiryDate);
     const expiryCheck = calculateCheckDigit(expiry);
 
-    const personalNum = formatAlphaNumeric(data.personalNumber, 14);
+    let personalNum = '<'.repeat(14);
+    if (data.includePersonalNumberInMrz && data.personalNumber) {
+        personalNum = formatAlphaNumeric(data.personalNumber, 14);
+    }
+    // The optional data field is always present in a TD3 MRZ. If unused, it's all '<'s.
+    // Its check digit is always calculated (resulting in '0' for an all-'<' field).
     const personalNumCheck = calculateCheckDigit(personalNum);
 
     const compositeData = docNum + docNumCheck + dob + dobCheck + expiry + expiryCheck + personalNum + personalNumCheck;
