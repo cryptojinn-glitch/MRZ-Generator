@@ -63,8 +63,8 @@ const MrzValidator: React.FC = () => {
                 <textarea
                     value={mrzInput}
                     onChange={(e) => setMrzInput(e.target.value)}
-                    placeholder={`P<GBRSAMIULLAH<<MUHAMMAD<<<<<<<<<<<<<<<<<<<<
-4829153671GBR9505014M3201200<<<<<<<<<<<<<<06`}
+                    placeholder={`P<DEUMUSTERMANN<<ERIKA<<<<<<<<<<<<<<<<<<<<<<
+C5J0F12341DEU7508103F3401310<<<<<<<<<<<<<<08`}
                     rows={4}
                     className="w-full bg-gray-900 border border-gray-600 rounded-md p-4 font-roboto-mono text-lg text-green-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition duration-200"
                 />

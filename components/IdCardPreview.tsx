@@ -60,7 +60,7 @@ const IdCardPreview: React.FC<IdCardPreviewProps> = ({ data }) => {
                     </div>
                     <div>
                         <p className="text-gray-400 text-xs">DATE OF ISSUE</p>
-                        <p className="font-semibold">2020-01-01</p>
+                        <p className="font-semibold">{data.dateOfIssue}</p>
                     </div>
                     <div>
                         <p className="text-gray-400 text-xs">DATE OF EXPIRY</p>

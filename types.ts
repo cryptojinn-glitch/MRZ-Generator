@@ -18,6 +18,7 @@ export interface IdData {
     nationality: string; // 3-letter code
     dateOfBirth: string; // YYYY-MM-DD
     gender: Gender;
+    dateOfIssue: string; // YYYY-MM-DD
     expiryDate: string; // YYYY-MM-DD
     personalNumber: string;
     includePersonalNumberInMrz?: boolean;
